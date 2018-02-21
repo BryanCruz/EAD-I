@@ -58,7 +58,6 @@ void testarListarSubsequencias(){
 }
 
 int main(void){
-
     //leitura dos dados para a verificação
     int k, M;
 
