@@ -19,42 +19,16 @@ void listarSequencia(int * seq, int M){
 
 void listarSubsequencias(int * seq, int M, int k){
   for(int i = 0; i < M-1; i++){
-    int j = 1;
-    if(seq[i]+j == seq[i+j]){
-      printf("%d", seq[i]);
-      while(i+j < M && seq[i]+j == seq[i+j]){
-        printf(", %d", seq[i+j]);
-        j++;
+      int tamSeq;
+      for(tamSeq = 1; i+tamSeq < M && tamSeq < k && seq[i]+tamSeq == seq[i+tamSeq]; tamSeq++);
+
+      if(tamSeq > 1){
+        for(int j = 0; j < tamSeq; j++){
+          printf("%d, ", seq[i+j]);
+        }
+        printf("\n");
       }
-      printf("\n");
-
-    }
   }
-}
-
-
-void testarListarSubsequencias(){
-  int seq1[] = {8,-10,4,-2,-1,0,1,2,50,51,54};
-  int M1 = 11;
-  int k1 = 4;
-
-  int seq2[] = { 5, 20, -9, 51, 52, 53, -1, -4, -3, -2, -1, 0, 1, 2, 3};
-  int M2 = 15;
-  int k2 = 7;
-
-  printf("Objetivo:\n");
-  printf("-2,-1,0,1\n");
-  printf("-1,0,1,2 \n");
-  printf("50,51    \n");
-  printf("Saída:   \n");
-  listarSubsequencias(seq1, M1, k1);
-
-  printf("\n\nObjetivo:          \n");
-  printf("51, 52, 53             \n");
-  printf("-4, -3, -2, -1, 0, 1, 2\n");
-  printf("-3, -2, -1, 0, 1, 2, 3 \n");
-  printf("Saída:\n");
-  listarSubsequencias(seq2, M2, k2);
 }
 
 int main(void){
