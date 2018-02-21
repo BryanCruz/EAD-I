@@ -20,14 +20,15 @@ void listarSequencia(int * seq, int M){
 void listarSubsequencias(int * seq, int M, int k){
   for(int i = 0; i < M-1; i++){
     int j = 1;
-    if(seq[i] == seq[i+j]+j){
+    if(seq[i]+j == seq[i+j]){
       printf("%d", seq[i]);
-      while(i+j < M && seq[i] == seq[i+j]+j){
+      while(i+j < M && seq[i]+j == seq[i+j]){
         printf(", %d", seq[i+j]);
         j++;
       }
+      printf("\n");
+
     }
-    printf("\n");
   }
 }
 
