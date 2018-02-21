@@ -58,7 +58,18 @@ void testarListarSubsequencias(){
 }
 
 int main(void){
-  testarListarSubsequencias();
 
-  return 0;
+    //leitura dos dados para a verificação
+    int k, M;
+
+    printf("Até quantos valores consecutivos: ");
+    scanf("%d", &k);
+
+    printf("Tamanho da sequencia: ");
+    scanf("%d", &M);
+
+
+    int * seq = lerSequencia(M);
+    listarSequencia(seq, M);
+    return 0;
 }
