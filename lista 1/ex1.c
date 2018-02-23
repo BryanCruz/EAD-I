@@ -18,22 +18,25 @@ void listarSequencia(int * seq, int M){
 }
 
 void listarSubsequencias(int * seq, int M, int k){
-  for(int i = 0; i < M-1; i++){
-    int tamSeq;
+  int i = 0, j = 0, qtd, lim;
+  int tamSeq;
+  while(i < M-1){
+    //achar o tamanho da sequencia de numeros consecutivos
     for(tamSeq = 1; i+tamSeq < M && seq[i]+tamSeq == seq[i+tamSeq]; tamSeq++);
 
     if(tamSeq > 1){
-      int lim = i + tamSeq - k;
-      int iAux = i;
+      qtd = tamSeq - k;
       do{
-        for(int j = 0; j < k && iAux+j < i+tamSeq; j++){
-          printf("%d, ", seq[iAux+j]);
+        lim = i + (tamSeq < k? tamSeq : k);
+        for(j = i; j < lim-1; j++){
+          printf("%d, ", seq[j]);
         }
-        iAux++;
-      }while(iAux < lim);
-
-
-      printf("\n");
+        printf("%d\n", seq[j]);
+        i++;
+      }while(--qtd >= 0);
+      i = j;
+    }else{
+      i++;
     }
   }
 }
