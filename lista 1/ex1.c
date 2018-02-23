@@ -54,5 +54,6 @@ int main(void){
 
     int * seq = lerSequencia(M);
     listarSequencia(seq, M);
+    free(seq);
     return 0;
 }
