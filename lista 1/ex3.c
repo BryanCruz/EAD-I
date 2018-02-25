@@ -1,6 +1,9 @@
 #include<stdio.h>
 #include<stdlib.h>
 
+/*Converte valores digitados para o sistema hexadecimal e os exibe como
+  em um display digital composto por 7 LEDs (Seven Segment Display)*/
+
 typedef struct s_numeroHexadecimal * numeroHexadecimal;
 struct s_numeroHexadecimal{
   int digito;
@@ -102,23 +105,14 @@ void exibirValor(numeroHexadecimal valor){
 }
 
 int main(void){
-  // unsigned long long int valor;
-  // scanf("%llu", &valor);
-  //
-  // char * valorEmHexa = converterParaHexadecimal(valor);
-  //
-  // exibirValor(valorEmHexa);
-  //
-  // free(valorEmHexa);
-  //
+  unsigned long long int valor;
 
-  numeroHexadecimal valor = converterParaHexadecimal(11073303771280);
-  exibirValor(valor);
-  free(valor);
+  while(scanf("%llu", &valor) > 0){
+    numeroHexadecimal valorEmHexa = converterParaHexadecimal(valor);
 
-  valor = converterParaHexadecimal(11259375);
-  exibirValor(valor);
-  free(valor);
+    exibirValor(valorEmHexa);
 
+    free(valorEmHexa);
+  }
   return 0;
 }
