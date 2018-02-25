@@ -194,32 +194,5 @@ int main(void){
     }
   }while(1);
 
-  // printf("%s\n", compararStrings("abcd", "gdea")? "errado" : "certo");
-  // printf("%s\n", compararStrings("abcd", "abcd")? "certo" : "errado");
-  // printf("%s\n", compararStrings("abcd", "abcde")? "errado" : "certo");
-  // printf("%s\n", compararStrings("abcde", "abcd")? "errado" : "certo");
-  // printf("%s\n", compararStrings("abcde", "abcdf")? "errado" : "certo");
-
-
-  // contatos lista = NULL;
-  // contatos teste2 = criarContato("joao", "555", "hidromel");
-  // contatos teste = criarContato("maria", "333", "eita");
-  // contatos teste3 = criarContato("jenosvaldo", "111", "lol");
-  // contatos teste4 = criarContato("maria", "113", "abc");
-  // addContato(&lista, teste);
-  //
-  // exibirLista(lista);
-  //
-  // addContato(&lista, teste2);
-  // exibirLista(lista);
-  //
-  // addContato(&lista, teste3);
-  // addContato(&lista, teste4);
-  // exibirLista(lista);
-
-  //buscarContatoPorNome(lista, "maria");
-//  buscarContatoPorNome(lista, "joao");
-//  buscarContatoPorNome(lista, "abcd");
-
   return 0;
 }
