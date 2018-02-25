@@ -23,35 +23,80 @@ numeroHexadecimal converterParaHexadecimal(unsigned long long int valor){
 }
 
 void exibirValor(numeroHexadecimal valor){
-  while(valor != NULL){
-    if(valor->digito >= 10){
-      char c;
-      switch(valor->digito){
-        case 10:
-          c = 'A';
-          break;
-        case 11:
-          c = 'B';
-          break;
-        case 12:
-          c = 'C';
-          break;
-        case 13:
-          c = 'D';
-          break;
-        case 14:
-          c = 'E';
-          break;
-        case 15:
-          c = 'F';
-          break;
-      }
+  int flag[7];
 
-      printf("%c", c);
+  numeroHexadecimal rodando = valor;
+  int digito;
+  //primeira linha
+  while(rodando != NULL){
+    digito = rodando->digito;
+
+    //a
+    if(digito != 1 && digito != 4 && digito != 11 && digito != 13){
+      printf(" _ ");
     }else{
-      printf("%d", valor->digito);
+      printf("   ");
     }
-    valor = valor->prox;
+
+    rodando = rodando->prox;
+  }
+  printf("\n");
+
+  //segunda linha
+  rodando = valor;
+  while(rodando != NULL){
+    digito = rodando->digito;
+    //f
+    if(digito != 1 && digito != 2 && digito != 3 && digito != 7 && digito != 13){
+      printf("|");
+    }else{
+      printf(" ");
+    }
+
+    //g
+    if(digito != 0 && digito != 1 && digito != 7 && digito != 12){
+      printf("_");
+    }else{
+      printf(" ");
+    }
+
+    //b
+    if(digito != 5 && digito != 6 && digito != 11 && digito != 12 && digito != 14 && digito != 15){
+      printf("|");
+    }else{
+      printf(" ");
+    }
+    rodando = rodando->prox;
+  }
+  printf("\n");
+
+
+  //terceira linha
+  rodando = valor;
+  while(rodando != NULL){
+    digito = rodando->digito;
+    //e
+    if(digito != 1 && digito != 3 && digito != 4 && digito != 5 && digito != 7 && digito != 9){
+      printf("|");
+    }else{
+      printf(" ");
+    }
+
+    //d
+    if(digito != 1 && digito != 4 && digito != 7 && digito != 10 && digito != 15){
+      printf("_");
+    }else{
+      printf(" ");
+    }
+
+    //c
+    if(digito != 2 && digito != 12 && digito != 14 && digito != 15){
+      printf("|");
+    }else{
+      printf(" ");
+    }
+
+    rodando = rodando->prox;
   }
   printf("\n");
 }
@@ -68,6 +113,10 @@ int main(void){
   //
 
   numeroHexadecimal valor = converterParaHexadecimal(11073303771280);
+  exibirValor(valor);
+  free(valor);
+
+  valor = converterParaHexadecimal(11259375);
   exibirValor(valor);
   free(valor);
 
