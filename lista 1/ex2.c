@@ -48,12 +48,16 @@ void exibirContato(contatos contato){
 
 void exibirLista(contatos lista){
   printf("========================================\n");
-  int i = 1;
-  while(lista != NULL){
-    printf("contato nº %d\n", i);
-    exibirContato(lista);
-    lista = lista->prox;
-    i++;
+  if(lista){
+    int i = 1;
+    while(lista != NULL){
+      printf("contato nº %d\n", i);
+      exibirContato(lista);
+      lista = lista->prox;
+      i++;
+    }
+  }else{
+    printf("AGENDA VAZIA\n");
   }
   printf("========================================\n\n");
 }
@@ -72,10 +76,10 @@ int compararStrings(char * string1, char * string2){
 void buscarContatoPorNome(contatos lista, char * nome){
   contatos result = NULL;
   int achou = 0;
-  printf("buscando por nome: %s\n", nome);
+  printf("BUSCANDO POR NOME: %s\n", nome);
   while(lista != NULL){
     if(compararStrings(lista->nome, nome)){
-      printf("contato encontrado:\n");
+      printf("CONTATO ENCONTRADO:\n");
       exibirContato(lista);
 
       achou = 1;
@@ -85,17 +89,17 @@ void buscarContatoPorNome(contatos lista, char * nome){
   }
 
   if(!achou){
-    printf("nenhum contato encontrado\n");
+    printf("NENHUM CONTATO ENCONTRADO\n");
   }
 }
 
 void buscarContatoPorTelefone(contatos lista, char * telefone){
   contatos result = NULL;
   int achou = 0;
-  printf("buscando por telefone: %s\n", telefone);
+  printf("BUSCANDO POR TELEFONE: %s\n", telefone);
   while(lista != NULL){
     if(compararStrings(lista->telefone, telefone)){
-      printf("contato encontrado:\n");
+      printf("CONTATO ENCONTRADO:\n");
       exibirContato(lista);
 
       achou = 1;
@@ -105,7 +109,23 @@ void buscarContatoPorTelefone(contatos lista, char * telefone){
   }
 
   if(!achou){
-    printf("nenhum contato encontrado\n");
+    printf("NENHUM CONTATO ENCONTRADO\n");
+  }
+}
+
+void excluirContato(contatos contato){
+  free(contato->nome);
+  free(contato->telefone);
+  free(contato->email);
+
+  free(contato);
+}
+
+void excluirLista(contatos lista){
+  while(lista != NULL){
+    contatos aux = lista->prox;
+    excluirContato(lista);
+    lista = aux;
   }
 }
 
@@ -114,57 +134,65 @@ void sair(){
 }
 
 int main(void){
-  // contatos agenda = NULL;
-  //
-  // do{
-  //   printf("\nEscolha uma opção: \n");
-  //   printf("1: Inserir um contato na agenda\n");
-  //   printf("2: Buscar um contato pelo nome\n");
-  //   printf("3: Buscar um contato pelo telefone\n");
-  //   printf("4: Mostrar agenda \n");
-  //   printf("5: Sair (atenção: sua agenda será DELETADA)\n");
-  //   printf("Sua opção: ");
-  //   char op;
-  //   scanf(" %c", &op);
-  //
-  //   printf("voce escolheu %c\n", op);
-  //   if(op == '1'){
-  //     char nome[50];
-  //     char telefone[50];
-  //     char email[50];
-  //
-  //     printf("Dados do novo contato:\n");
-  //     printf("Nome: ");
-  //     scanf("%s", nome);
-  //     printf("Telefone: ");
-  //     scanf("%s", telefone);
-  //     printf("Email: ");
-  //     scanf("%s", email);
-  //
-  //     contatos novo = criarContato(nome, telefone, email);
-  //     if(novo){
-  //       addContato(&agenda, novo);
-  //       printf("contato inserido com sucesso\n");
-  //     }else{
-  //       printf("memória insuficiente para criar novo contato\n");
-  //     }
-  //   }else if(op == '2'){
-  //     char nome[50];
-  //     printf("Digite o nome a ser procurado: ");
-  //     scanf("%s", nome);
-  //
-  //     buscarContatoPorNome(agenda, nome);
-  //   }else if(op == '3'){
-  //     char numero[50];
-  //     printf("Digite o numero a ser procurado: ");
-  //     scanf("%s", numero);
-  //
-  //     buscarContatoPorNome(agenda, numero);
-  //   }else if(op == '4'){
-  //     exibirLista(agenda);
-  //   }
-  //
-  // }while(1);
+  contatos agenda = NULL;
+
+  do{
+    printf("\nEscolha uma opção: \n");
+    printf("1: Inserir um contato na agenda\n");
+    printf("2: Buscar um contato pelo nome\n");
+    printf("3: Buscar um contato pelo telefone\n");
+    printf("4: Mostrar agenda \n");
+    printf("5: Sair (atenção: sua agenda será DELETADA)\n");
+    printf("Sua opção: ");
+    char op;
+    scanf(" %c", &op);
+
+    printf("VOCÊ ESCOLHEU: %c\n", op);
+    if(op == '1'){
+      char * nome = (char*) malloc(50*sizeof(char));
+      char * telefone = (char*) malloc(50*sizeof(char));
+      char * email = (char*) malloc(50*sizeof(char));
+
+      printf("Dados do novo contato:\n");
+      printf("Nome: ");
+      scanf("%s", nome);
+      printf("Telefone: ");
+      scanf("%s", telefone);
+      printf("Email: ");
+      scanf("%s", email);
+
+      contatos novo = criarContato(nome, telefone, email);
+      if(novo){
+        addContato(&agenda, novo);
+        printf("CONTATO INSERIDO COM SUCESSO\n");
+      }else{
+        printf("MEMÓRIA INSUFICIENTE PARA CRIAR NOVO CONTATO\n");
+      }
+    }else if(op == '2'){
+      char * nome = (char*) malloc(50*sizeof(char));
+      printf("Digite o nome a ser procurado: ");
+      scanf("%s", nome);
+
+      buscarContatoPorNome(agenda, nome);
+
+      free(nome);
+    }else if(op == '3'){
+      char * numero = (char*) malloc(50*sizeof(char));
+      printf("Digite o numero a ser procurado: ");
+      scanf("%s", numero);
+
+      buscarContatoPorTelefone(agenda, numero);
+
+      free(numero);
+    }else if(op == '4'){
+      exibirLista(agenda);
+    }else if(op == '5'){
+      excluirLista(agenda);
+      sair();
+    }else{
+      printf("\nOPÇÃO INVÁLIDA\n");
+    }
+  }while(1);
 
   // printf("%s\n", compararStrings("abcd", "gdea")? "errado" : "certo");
   // printf("%s\n", compararStrings("abcd", "abcd")? "certo" : "errado");
@@ -173,21 +201,21 @@ int main(void){
   // printf("%s\n", compararStrings("abcde", "abcdf")? "errado" : "certo");
 
 
-  contatos lista = NULL;
-  contatos teste2 = criarContato("joao", "555", "hidromel");
-  contatos teste = criarContato("maria", "333", "eita");
-  contatos teste3 = criarContato("jenosvaldo", "111", "lol");
-  contatos teste4 = criarContato("maria", "113", "abc");
-  addContato(&lista, teste);
-
-  exibirLista(lista);
-
-  addContato(&lista, teste2);
-  exibirLista(lista);
-
-  addContato(&lista, teste3);
-  addContato(&lista, teste4);
-  exibirLista(lista);
+  // contatos lista = NULL;
+  // contatos teste2 = criarContato("joao", "555", "hidromel");
+  // contatos teste = criarContato("maria", "333", "eita");
+  // contatos teste3 = criarContato("jenosvaldo", "111", "lol");
+  // contatos teste4 = criarContato("maria", "113", "abc");
+  // addContato(&lista, teste);
+  //
+  // exibirLista(lista);
+  //
+  // addContato(&lista, teste2);
+  // exibirLista(lista);
+  //
+  // addContato(&lista, teste3);
+  // addContato(&lista, teste4);
+  // exibirLista(lista);
 
   //buscarContatoPorNome(lista, "maria");
 //  buscarContatoPorNome(lista, "joao");
