@@ -53,6 +53,22 @@ void removeNodeInPosition(linkedList * list, int position){
   }
 }
 
+linkedList concatenateLists(linkedList list1, linkedList list2){
+  if(list1 && list2){
+    while(list1->next != NULL){
+      list1 = list1->next;
+    }
+
+    list1->next = list2;
+  }else{
+    if(!list1){
+      list1 = list2;
+    }
+  }
+
+  return NULL;
+}
+
 void printList(linkedList list){
   while(list){
     printf("%d ", list->item);
@@ -60,7 +76,6 @@ void printList(linkedList list){
   }
   printf("\n");
 }
-
 
 void testInsertNodeInPosition(){
   linkedList list = NULL;
