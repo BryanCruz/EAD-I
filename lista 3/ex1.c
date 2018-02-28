@@ -53,20 +53,59 @@ void removeNodeInPosition(linkedList * list, int position){
   }
 }
 
-linkedList concatenateLists(linkedList list1, linkedList list2){
-  if(list1 && list2){
-    while(list1->next != NULL){
-      list1 = list1->next;
+linkedList concatenateLists(linkedList * list1, linkedList * list2){
+
+  if(*list1 && *list2){
+    linkedList list1Aux = *list1;
+    linkedList list2Aux = *list2;
+    while(list1Aux->next != NULL){
+      list1Aux = list1Aux->next;
     }
 
-    list1->next = list2;
+    list1Aux->next = list2Aux;
   }else{
-    if(!list1){
-      list1 = list2;
+    if(!(*list1)){
+      *list1 = *list2;
     }
   }
 
-  return NULL;
+  return *list1;
+}
+
+
+linkedList reverseList(linkedList * list){
+  linkedList rodando = *list;
+
+  if(rodando){
+    linkedList prox = rodando->next;
+    while(prox){
+      linkedList aux = prox->next;
+      prox->next = rodando;
+      rodando = prox;
+      prox = aux;
+    }
+    (*list)->next = NULL;
+    *list = rodando;
+  }
+}
+
+linkedList splitList(linkedList list){
+  int n = 0;
+  linkedList aux = list;
+  while(aux){
+    n++;
+    aux = aux->next;
+  }
+
+  aux = list;
+  for(int i = 0; i < n/2 - 1 || !(i % 2); i++){
+    aux = aux->next;
+  }
+
+  linkedList list2 = aux->next;
+  aux->next = NULL;
+
+  return list2;
 }
 
 void printList(linkedList list){
@@ -163,8 +202,96 @@ void testRemoveNodeInPosition(){
   free(nodes);
 }
 
+void testConcatenateLists(){
+  linkedList list1 = NULL;
+  linkedList list2 = NULL;
+
+  printf("lista 1: ");
+  printList(list1);
+  printf("lista 2: ");
+  printList(list2);
+
+  concatenateLists(&list1, &list2);
+  printf("listas concatenadas: ");
+  printList(list1);
+
+  insertNodeInPosition(&list2, createNode(-1), 0);
+  printf("lista 1: ");
+  printList(list1);
+  printf("lista 2: ");
+  printList(list2);
+  concatenateLists(&list1, &list2);
+  printf("listas concatenadas: ");
+  printList(list1);
+
+  printf("lista 1: ");
+  printList(list1);
+  printf("lista 2: ");
+  printList(list2);
+  concatenateLists(&list1, &list2);
+  printf("listas concatenadas: ");
+  printList(list1);
+
+  insertNodeInPosition(&list1, createNode(0), 0);
+  insertNodeInPosition(&list1, createNode(1), 0);
+  insertNodeInPosition(&list1, createNode(2), 0);
+  insertNodeInPosition(&list1, createNode(3), 0);
+  insertNodeInPosition(&list1, createNode(4), 0);
+  insertNodeInPosition(&list2, createNode(-2), 0);
+  insertNodeInPosition(&list2, createNode(-3), 0);
+  insertNodeInPosition(&list2, createNode(-4), 0);
+  insertNodeInPosition(&list2, createNode(-5), 0);
+
+  printf("lista 1: ");
+  printList(list1);
+  printf("lista 2: ");
+  printList(list2);
+
+  concatenateLists(&list1, &list2);
+  printf("listas concatenadas: ");
+  printList(list1);
+
+}
+
+void testReverseList(){
+  linkedList list1 = NULL;
+  printList(list1);
+  reverseList(&list1);
+  printList(list1);
+
+  insertNodeInPosition(&list1, createNode(0), 0);
+  insertNodeInPosition(&list1, createNode(1), 0);
+  insertNodeInPosition(&list1, createNode(2), 0);
+  insertNodeInPosition(&list1, createNode(3), 0);
+  insertNodeInPosition(&list1, createNode(4), 0);
+
+  printList(list1);
+  reverseList(&list1);
+  printList(list1);
+}
+
+void testSplitList(){
+  linkedList list1 = NULL;
+
+  insertNodeInPosition(&list1, createNode(0), 0);
+  insertNodeInPosition(&list1, createNode(1), 0);
+  insertNodeInPosition(&list1, createNode(2), 0);
+  insertNodeInPosition(&list1, createNode(3), 0);
+  insertNodeInPosition(&list1, createNode(2), 0);
+  insertNodeInPosition(&list1, createNode(3), 0);
+
+  insertNodeInPosition(&list1, createNode(4), 0);
+
+  printList(list1);
+
+
+  linkedList list2 = splitList(list1);
+  printList(list1);
+  printList(list2);
+}
+
 int main(){
-  testRemoveNodeInPosition();
+  testSplitList();
 
   return 0;
 }
