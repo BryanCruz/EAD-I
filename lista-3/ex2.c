@@ -72,15 +72,30 @@ void inserirNoElementoNaLista(noCabeca lista, noElemento elemento, int tipo){
   noElemento tmp = lista->proxElemento;
   noElemento prev = NULL;
 
+  //acha o elemento que vem antes do a ser inserido (prev) e o que vem dps (tmp)
   while(tmp && (tipo==1? (tmp->coluna < elemento->coluna) : (tmp->linha < elemento->linha))){
     prev = tmp;
     tmp = (tipo==1? tmp->proxColuna : tmp->proxLinha);
   }
 
   if(tipo == 1){
-    elemento->proxColuna = tmp;
+    if(tmp){
+      if(tmp->coluna != elemento->coluna){
+        elemento->proxColuna = tmp;
+      }else{
+        elemento->proxColuna = tmp->proxColuna;
+        free(tmp);
+      }
+    }
   }else{
-    elemento->proxLinha = tmp;
+    if(tmp){
+      if(tmp->linha != elemento->linha){
+        elemento->proxLinha = tmp;
+      }else{
+        elemento->proxLinha = tmp->proxLinha;
+        free(tmp);
+      }
+    }
   }
   // tipo==1? (elemento->proxLinha = tmp) : (elemento->proxColuna = tmp);
   if(prev){
@@ -151,9 +166,9 @@ int main(void){
                            {0, 9, 0, 0, 0, 0, 0},
                            {0, 9, 0, 0, 0, 0, 0},
                            {4, 0, 0, 6, 0, 0, 0},
+                           {0, 0, 0, 0, 0, 0, 0}, //4, 4
                            {0, 0, 0, 0, 0, 0, 0},
-                           {0, 0, 0, 0, 0, 0, 0},
-                           {0, 7, 0, 0, 0, 0, 0},
+                           {0, 7, 0, 0, 0, 0, 0}, //6, 1
                            {0, 0, 0, 0, 0, 0, 0}
                           };
 
@@ -181,6 +196,22 @@ int main(void){
       }
     }
   }
+
+  noCabeca linha = inserirNoCabeca(&linhas, 4);
+  noCabeca coluna = inserirNoCabeca(&colunas, 4);
+  inserirNoElemento(linha, coluna, 4);
+
+  linha = inserirNoCabeca(&linhas, 6);
+  coluna = inserirNoCabeca(&colunas, 1);
+  inserirNoElemento(linha, coluna, 1);
+
+  linha = inserirNoCabeca(&linhas, 6);
+  coluna = inserirNoCabeca(&colunas, 0);
+  inserirNoElemento(linha, coluna, 5);
+
+  linha = inserirNoCabeca(&linhas, 6);
+  coluna = inserirNoCabeca(&colunas, 6);
+  inserirNoElemento(linha, coluna, 9);
 
   // printf("colunas e linhas\n");
   // exibirListaDeNoCabecas(linhas);
