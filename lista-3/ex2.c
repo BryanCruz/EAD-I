@@ -1,11 +1,9 @@
 #include<stdio.h>
 #include<stdlib.h>
 
-// #define m 8;
-// #define n 7;
-
 typedef struct s_noCabeca * noCabeca;
 typedef struct s_noElemento * noElemento;
+typedef struct s_matriz matriz;
 
 struct s_noCabeca{
   int index;
@@ -22,8 +20,18 @@ struct s_noElemento{
   noElemento proxLinha;
 };
 
-noCabeca inserirNoCabeca(noCabeca * lista, int index){
+struct s_matriz{
+  int altura;
+  int largura;
+
+  noCabeca linhas;
+  noCabeca colunas;
+};
+
+// noCabeca inserirNoCabeca(noCabeca * lista, int index){
+noCabeca inserirNoCabeca(matriz * m, int index, int tipo){
   // checa se já não existe aquele indice
+  noCabeca * lista = tipo==1? &(m->linhas) : &(m->colunas);
   noCabeca tmp = *lista;
   noCabeca prev = NULL;
   int existe = 0;
@@ -48,17 +56,22 @@ noCabeca inserirNoCabeca(noCabeca * lista, int index){
 
     //inserir na lista
     if(*lista){
-      // printf("if *lista\n");
       no->proxCabeca = tmp;
       if(prev){//verifica se existe um nó que vem antes do novo
         prev->proxCabeca = no;
-        // printf("if prev\n");
-      }else{
-        *lista = no;
+      }else{//o no a ser inserido é o primeiro da lista de indices
+        if(tipo == 1){
+          m->linhas = no;
+        }else{
+          m->colunas = no;
+        }
       }
     }else{ //se a lista estiver vazia
-      // printf("else\n");
-      *lista = no;
+      if(tipo == 1){
+        m->linhas = no;
+      }else{
+        m->colunas = no;
+      }
     }
   }else{
     no = prev;
@@ -78,7 +91,7 @@ void inserirNoElementoNaLista(noCabeca lista, noElemento elemento, int tipo){
     tmp = (tipo==1? tmp->proxColuna : tmp->proxLinha);
   }
 
-  if(tipo == 1){
+  if(tipo == 1){  
     if(tmp){
       if(tmp->coluna != elemento->coluna){
         elemento->proxColuna = tmp;
@@ -123,6 +136,15 @@ void inserirNoElemento(noCabeca linha, noCabeca coluna, int valor){
   inserirNoElementoNaLista(coluna, elemento, 2);
 }
 
+void inserirElementoNaMatriz(matriz * m, int indexLinha, int indexColuna, int valor){
+  //insere/busca os nós cabeças
+  noCabeca linha = inserirNoCabeca(m, indexLinha, 1);
+  noCabeca coluna = inserirNoCabeca(m, indexColuna, 2);
+
+  //insere os elementos na respectiva linha e coluna
+  inserirNoElemento(linha, coluna, valor);
+}
+
 void exibirListaDeNoCabecas(noCabeca lista){
   while(lista){
     printf("%d ", lista->index);
@@ -133,12 +155,12 @@ void exibirListaDeNoCabecas(noCabeca lista){
 
 //tipo == 1 -> exibir pelas linhas (horizontal)
 //tipo == 2 -> exibir pelas colunas (vertical)
-void exibirMatrizEsparsa(noCabeca listaCabecas, int tipo, int m, int n){
-  noCabeca cabecas = listaCabecas;
+void exibirMatrizEsparsa(matriz m){
+  noCabeca cabecas = m.linhas;
   noElemento elemento = cabecas->proxElemento;
 
-  for(int i = 0; i < m; i++){
-    for(int j = 0; j < n; j++){
+  for(int i = 0; i < m.altura; i++){
+    for(int j = 0; j < m.largura; j++){
       if(elemento && elemento->coluna == j && elemento->linha == i){
         printf("%d ", elemento->valor);
         elemento = elemento->proxColuna;
@@ -158,8 +180,9 @@ void exibirMatrizEsparsa(noCabeca listaCabecas, int tipo, int m, int n){
 }
 
 int main(void){
-  noCabeca colunas = NULL;
-  noCabeca linhas  = NULL;
+  matriz m = {8, 7, NULL, NULL};
+  // noCabeca colunas = NULL;
+  // noCabeca linhas  = NULL;
 
   int matrizTeste[8][7] = {
                            {0, 0, 0, 5, 0, 0, 0},
@@ -184,41 +207,30 @@ int main(void){
   for(int i = 0; i < 8; i++){
     for(int j = 0; j < 7; j++){
       if(matrizTeste[i][j]){
-        // printf("i: %d j: %d\n", i, j);
-        // printf(" linha\n");
-        //insere os nós cabeças, se eles não exisitirem
-        noCabeca linha = inserirNoCabeca(&linhas, i);
-        // printf(" coluna\n");
-        noCabeca coluna = inserirNoCabeca(&colunas, j);
-
-        //insere os elementos na respectiva linha e coluna
-        inserirNoElemento(linha, coluna, matrizTeste[i][j]);
+        inserirElementoNaMatriz(&m, i, j, matrizTeste[i][j]);
       }
     }
   }
-
-  noCabeca linha = inserirNoCabeca(&linhas, 4);
-  noCabeca coluna = inserirNoCabeca(&colunas, 4);
-  inserirNoElemento(linha, coluna, 4);
-
-  linha = inserirNoCabeca(&linhas, 6);
-  coluna = inserirNoCabeca(&colunas, 1);
-  inserirNoElemento(linha, coluna, 1);
-
-  linha = inserirNoCabeca(&linhas, 6);
-  coluna = inserirNoCabeca(&colunas, 0);
-  inserirNoElemento(linha, coluna, 5);
-
-  linha = inserirNoCabeca(&linhas, 6);
-  coluna = inserirNoCabeca(&colunas, 6);
-  inserirNoElemento(linha, coluna, 9);
-
-  // printf("colunas e linhas\n");
-  // exibirListaDeNoCabecas(linhas);
-  // exibirListaDeNoCabecas(colunas);
-
-  printf("exibir matriz esparsa\n");
-  exibirMatrizEsparsa(linhas, 1, 8, 7);
+  //
+  // inserirElementoNaMatriz(&m, 4, 4, 4);
+  exibirMatrizEsparsa(m);
+  // printf("\n");
+  //
+  // inserirElementoNaMatriz(&m, 6, 1, 1);
+  // exibirMatrizEsparsa(m);
+  // printf("\n");
+  //
+  // inserirElementoNaMatriz(&m, 6, 0, 5);
+  // exibirMatrizEsparsa(m);
+  // printf("\n");
+  //
+  // inserirElementoNaMatriz(&m, 6, 6, 9);
+  // exibirMatrizEsparsa(m);
+  // printf("\n");
+  //
+  // inserirElementoNaMatriz(&m, 6, 1, 1);
+  // exibirMatrizEsparsa(m);
+  // printf("\n");
 
   return 0;
 }
