@@ -5,6 +5,7 @@ typedef struct treeNode * treeNode;
 struct treeNode{
   int ra;
   int grade;
+  int balanceFactor;
 
   treeNode nextLeft;
   treeNode nextRight;
@@ -15,6 +16,7 @@ treeNode createNode(int ra, int grade){
 
   newNode->ra    = ra;
   newNode->grade = grade;
+  newNode->balanceFactor = 0;
   newNode->nextLeft = NULL;
   newNode->nextRight = NULL;
 
@@ -157,90 +159,80 @@ int checkBalance(treeNode * root){
     }
 }
 
-void insertNode(treeNode * root, int ra, int grade){
-  treeNode newNode = createNode(ra, grade);
+void updateBalanceFactor(treeNode node){
+  node->balanceFactor = height(node->nextLeft) - height(node->nextRight);
+}
 
+int insertNode(treeNode * root, treeNode newNode){
+  int rotated = 0;
   if(*root){
-    treeNode prev = NULL;
-    treeNode tmp = *root;
-
-    while(tmp){
-      prev = tmp;
-      if(ra < tmp->ra){
-        tmp = tmp->nextLeft;
-      }else if(ra > tmp->ra){
-        tmp = tmp->nextRight;
-      }else{
-        break;
-      }
-    }
-
-    //insert only if (tmp is null <=> ra doesn't exists in the tree)
-    if(!tmp){
-      if(ra < prev->ra){
-        prev->nextLeft = newNode;
-      }else{
-        prev->nextRight = newNode;
-      }
+    if((*root)->ra == newNode->ra){
+      (*root)->grade = newNode->grade;
+      free(newNode);
     }else{
-    	tmp->grade = grade;
-    	free(newNode);
+      if((*root)->ra > newNode->ra){
+        rotated = rotated || insertNode(&(*root)->nextLeft, newNode);
+      }else{
+        rotated = rotated || insertNode(&(*root)->nextRight, newNode);
+      }
+
+      if(!rotated){
+        updateBalanceFactor(*root);
+        int bF = (*root)->balanceFactor;
+        if(bF < -1 || bF > 1){
+          printf("[No desbalanceado: %d]\n", (*root)->ra);
+          rotate(root);
+
+          rotated = 1;
+        }
+      }
     }
   }else{
     *root = newNode;
   }
+
+  return rotated;
 }
 
 void insertRa(treeNode * root, int ra, int grade){
-  insertNode(root, ra, grade);
-  checkBalance(root);
+  treeNode newNode = createNode(ra, grade);
+  if(!insertNode(root, newNode)){
+    printf("[Ja esta balanceado]\n");
+  }
 }
 
 void deleteNode(treeNode * root, int ra){
-  treeNode prev = NULL;
-  treeNode tmp = *root;
-
-  while(tmp && tmp->ra != ra){
-    prev = tmp;
-    if(ra < tmp->ra){
-      tmp = tmp->nextLeft;
-    }else{
-      tmp = tmp->nextRight;
-    }
-  }
-
-  //if tmp <=> there's a key with this ra
-  if(tmp){
-    if(tmp->nextLeft && tmp->nextRight){
-      treeNode tmp2 = tmp->nextRight;
-      while(tmp2->nextLeft){
-        tmp2 = tmp2->nextLeft;
-      }
-
-      tmp->ra = tmp2->ra;
-      tmp->grade = tmp2->grade;
-      deleteNode(&(tmp->nextRight), tmp->ra);
-    }else{
-      treeNode tmp2;
-      if(tmp->nextLeft){
-        tmp2 = tmp->nextLeft;
-      }else{
-        tmp2 = tmp->nextRight;
-      }
-
-      if(prev){
-        if(ra < prev->ra){
-          prev->nextLeft  = tmp2;
-        }else{
-          prev->nextRight = tmp2;
-        }
-      }else{
-        *root = tmp2;
-      }
-
-      free(tmp);
-    }
-  }
+  // if((*root)->ra == ra){
+  //   if((*root)->nextLeft && (*root)->nextRight){
+  //     treeNode tmp = (*root)->nextRight;
+  //     while(tmp->nextLeft){
+  //       tmp = tmp->nextLeft;
+  //     }
+  //
+  //     (*root)->ra = tmp->ra;
+  //     (*root)->grade = tmp->grade;
+  //     deleteNode(&(*root)->nextRight, (*root)->ra);
+  //   }else{
+  //     treeNode tmp;
+  //     if((*root)->nextLeft){
+  //       tmp = (*root)->nextLeft;
+  //     }else{
+  //       tmp = (*root)->nextRight;
+  //     }
+  //
+  //     if(prev){
+  //       if(ra < prev->ra){
+  //         prev->nextLeft  = tmp2;
+  //       }else{
+  //         prev->nextRight = tmp2;
+  //       }
+  //     }else{
+  //       *root = tmp2;
+  //     }
+  //
+  //     free(tmp);
+  //   }
+  // }
 }
 
 void deleteRa(treeNode * root, int ra){
