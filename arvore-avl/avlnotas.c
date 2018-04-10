@@ -104,7 +104,7 @@ void rotate(treeNode * root){
 	int balanceFactor = getBalanceFactor(*root);
 	int childBalanceFactor;
 	if(balanceFactor >= 0){
-	  	c2 = 'D'; 
+	  	c2 = 'D';
 	    childBalanceFactor = getBalanceFactor((*root)->nextLeft);
 	    if(childBalanceFactor >= 0){
 	      c1 = 'S';
@@ -113,9 +113,9 @@ void rotate(treeNode * root){
 	      c1 = 'D';
 	      rotateLR(root);
 	    }
-	  
+
 	}else{
-	    c2 = 'E';	
+	    c2 = 'E';
 	    childBalanceFactor = getBalanceFactor((*root)->nextRight);
 	    if(childBalanceFactor <= 0){
 	      c1 = 'S';
@@ -125,7 +125,7 @@ void rotate(treeNode * root){
 	      rotateRL(root);
 	    }
 	}
-  
+
 	y = (*root)->ra;
 	x = (*root)->nextLeft->ra;
 	z = (*root)->nextRight->ra;
@@ -133,24 +133,27 @@ void rotate(treeNode * root){
 	printf("[x=%d y=%d z=%d]\n", x, y, z);
 }
 
-void balance(treeNode * root){
+int balance(treeNode * root){
+  int balanced = 1;
   if(*root){
-    balance(&((*root)->nextLeft));
-    balance(&((*root)->nextRight));
+    balanced = balance(&((*root)->nextLeft));
+    balanced = balanced && balance(&((*root)->nextRight));
 
-    if(!isBalanced(*root))	{
+    if(!isBalanced(*root)){
       printf("[No desbalanceado: %d]\n", (*root)->ra);
       rotate(root);
+
+      balanced = 0;
     }
   }
+
+  return balanced;
 }
 
-void checkBalance(treeNode * root){
-	int balanced = isBalanced(*root);
+int checkBalance(treeNode * root){
+	int balanced = balance(root);
     if(balanced){
       printf("[Ja esta balanceado]\n");
-    }else{
-      balance(root);
     }
 }
 
@@ -252,7 +255,7 @@ void clearTree(treeNode * root){
 
 		free(*root);
 	}
-	
+
 	*root = NULL;
 }
 
@@ -269,40 +272,40 @@ void posOrderRecursion(treeNode root){
 	}
 }
 
-void posOrderPrint(treeNode root){
+void printPosOrder(treeNode root){
 	printf("[");
 	posOrderRecursion(root);
 	printf("]\n");
 }
 
-void printTopDownAux(treeNode root, int h){
-  if(h == 0){
-    if(root){
-      printf("%d(%d) ", root->ra, root->grade);
-    }else{
-      printf("- ");
-    }
-  }else{
-    if(root){
-      printTopDownAux(root->nextLeft,  h-1);
-      printTopDownAux(root->nextRight, h-1);
-    }else{
-      printTopDownAux(NULL, h-1);
-      printTopDownAux(NULL, h-1);
-    }
-  }
-}
-
-void printTopDown(treeNode root){
-  int h = height(root);
-  for(int i = 0; i <= h; i++){
-    for(int j = 0; j < h-i; j++){
-      printf(" ");
-    }
-    printTopDownAux(root, i);
-    printf("\n");
-  }
-}
+// void printTopDownAux(treeNode root, int h){
+//   if(h == 0){
+//     if(root){
+//       printf("%d(%d) ", root->ra, root->grade);
+//     }else{
+//       printf("- ");
+//     }
+//   }else{
+//     if(root){
+//       printTopDownAux(root->nextLeft,  h-1);
+//       printTopDownAux(root->nextRight, h-1);
+//     }else{
+//       printTopDownAux(NULL, h-1);
+//       printTopDownAux(NULL, h-1);
+//     }
+//   }
+// }
+//
+// void printTopDown(treeNode root){
+//   int h = height(root);
+//   for(int i = 0; i <= h; i++){
+//     for(int j = 0; j < h-i; j++){
+//       printf(" ");
+//     }
+//     printTopDownAux(root, i);
+//     printf("\n");
+//   }
+// }
 
 void printGrade(treeNode root, int ra){
 	int i = 0;
@@ -346,20 +349,17 @@ int main(void){
       	scanf("%d", &ra);
       	printGrade(root, ra);
       	break;
-      case 'C':
-        checkBalance(&root);
-        break;
       case 'A':
       	printTreeHeight(root);
       	break;
       case 'P':
-        posOrderPrint(root);
-		clearTree(&root);
+        printPosOrder(root);
+		    clearTree(&root);
         exit(0);
         break;
-      case 'T':
-      	printTopDown(root);
-      	break;
+      // case 'T':
+      // 	printTopDown(root);
+      // 	break;
     }
     scanf("\n%c", &c);
   }
