@@ -5,7 +5,7 @@ typedef struct treeNode * treeNode;
 struct treeNode{
   int ra;
   int grade;
-  int balanceFactor;
+  int height;
 
   treeNode nextLeft;
   treeNode nextRight;
@@ -16,7 +16,7 @@ treeNode createNode(int ra, int grade){
 
   newNode->ra    = ra;
   newNode->grade = grade;
-  newNode->balanceFactor = 0;
+  newNode->height = 0;
   newNode->nextLeft = NULL;
   newNode->nextRight = NULL;
 
@@ -28,15 +28,14 @@ int max(int a, int b){
   return a > b ? a : b;
 }
 
-int height(treeNode root){
-  int h;
-  if(root){
-    h = 1 + max(height(root->nextLeft), height(root->nextRight));
-  }else{
-    h = -1;
-  }
+int getHeight(treeNode node){
+    return node? node->height : -1;
+}
 
-  return h;
+int updateHeight(treeNode node){
+  if(node){
+    node->height = 1 + max(getHeight(node->nextLeft), getHeight(node->nextRight));
+  }
 }
 
 void printInOrder(treeNode root){
@@ -50,8 +49,8 @@ void printInOrder(treeNode root){
 int getBalanceFactor(treeNode root){
   int factor;
   if(root){
-    int hL = height(root->nextLeft);
-    int hR = height(root->nextRight);
+    int hL = getHeight(root->nextLeft);
+    int hR = getHeight(root->nextRight);
     factor = hL - hR;
   }else{
     factor = 0;
@@ -135,32 +134,13 @@ void rotate(treeNode * root){
 	printf("[x=%d y=%d z=%d]\n", x, y, z);
 }
 
-int balance(treeNode * root){
-  int balanced = 1;
-  if(*root){
-    balanced = balance(&((*root)->nextLeft));
-    balanced = balanced && balance(&((*root)->nextRight));
+void balance(treeNode * root){
+  printf("[No desbalanceado: %d]\n", (*root)->ra);
+  rotate(root);
 
-    if(!isBalanced(*root)){
-      printf("[No desbalanceado: %d]\n", (*root)->ra);
-      rotate(root);
-
-      balanced = 0;
-    }
-  }
-
-  return balanced;
-}
-
-int checkBalance(treeNode * root){
-	int balanced = balance(root);
-    if(balanced){
-      printf("[Ja esta balanceado]\n");
-    }
-}
-
-void updateBalanceFactor(treeNode node){
-  node->balanceFactor = height(node->nextLeft) - height(node->nextRight);
+  updateHeight((*root)->nextLeft);
+  updateHeight((*root)->nextRight);
+  updateHeight(*root);
 }
 
 int insertNode(treeNode * root, treeNode newNode){
@@ -171,17 +151,16 @@ int insertNode(treeNode * root, treeNode newNode){
       free(newNode);
     }else{
       if((*root)->ra > newNode->ra){
-        rotated = rotated || insertNode(&(*root)->nextLeft, newNode);
+        rotated = insertNode(&(*root)->nextLeft, newNode);
       }else{
-        rotated = rotated || insertNode(&(*root)->nextRight, newNode);
+        rotated = insertNode(&(*root)->nextRight, newNode);
       }
 
       if(!rotated){
-        updateBalanceFactor(*root);
-        int bF = (*root)->balanceFactor;
-        if(bF < -1 || bF > 1){
-          printf("[No desbalanceado: %d]\n", (*root)->ra);
-          rotate(root);
+        updateHeight(*root);
+
+        if(!isBalanced(*root)){
+          balance(root);
 
           rotated = 1;
         }
@@ -196,48 +175,66 @@ int insertNode(treeNode * root, treeNode newNode){
 
 void insertRa(treeNode * root, int ra, int grade){
   treeNode newNode = createNode(ra, grade);
-  if(!insertNode(root, newNode)){
+  int alreadyBalanced = !insertNode(root, newNode);
+
+  if(alreadyBalanced){
     printf("[Ja esta balanceado]\n");
   }
 }
 
-void deleteNode(treeNode * root, int ra){
-  // if((*root)->ra == ra){
-  //   if((*root)->nextLeft && (*root)->nextRight){
-  //     treeNode tmp = (*root)->nextRight;
-  //     while(tmp->nextLeft){
-  //       tmp = tmp->nextLeft;
-  //     }
-  //
-  //     (*root)->ra = tmp->ra;
-  //     (*root)->grade = tmp->grade;
-  //     deleteNode(&(*root)->nextRight, (*root)->ra);
-  //   }else{
-  //     treeNode tmp;
-  //     if((*root)->nextLeft){
-  //       tmp = (*root)->nextLeft;
-  //     }else{
-  //       tmp = (*root)->nextRight;
-  //     }
-  //
-  //     if(prev){
-  //       if(ra < prev->ra){
-  //         prev->nextLeft  = tmp2;
-  //       }else{
-  //         prev->nextRight = tmp2;
-  //       }
-  //     }else{
-  //       *root = tmp2;
-  //     }
-  //
-  //     free(tmp);
-  //   }
-  // }
+int deleteNode(treeNode * root, int ra){
+  int rotated = 0;
+
+  if(!(*root)){
+    return rotated;
+  }
+
+  if((*root)->ra == ra){
+    if((*root)->nextLeft && (*root)->nextRight){
+      treeNode tmp = (*root)->nextRight;
+      while(tmp->nextLeft){
+        tmp = tmp->nextLeft;
+      }
+
+      (*root)->ra = tmp->ra;
+      (*root)->grade = tmp->grade;
+      rotated = deleteNode(&(*root)->nextRight, (*root)->ra);
+    }else{
+      treeNode tmp;
+
+      if((*root)->nextLeft){
+        tmp = (*root)->nextLeft;
+      }else{
+        tmp = (*root)->nextRight;
+      }
+
+      treeNode deleteMe = *root;
+      *root = tmp;
+
+      free(deleteMe);
+    }
+  }else{
+    if(ra < (*root)->ra){
+      rotated = deleteNode(&(*root)->nextLeft, ra);
+    }else{
+      rotated = deleteNode(&(*root)->nextRight, ra);
+    }
+  }
+  
+  updateHeight(*root);
+  if(!isBalanced(*root)){
+    balance(root);
+    rotated = 1;
+  }
+
+  return rotated;
 }
 
 void deleteRa(treeNode * root, int ra){
-	deleteNode(root, ra);
-	checkBalance(root);
+	int alreadyBalanced = !deleteNode(root, ra);
+  if(alreadyBalanced){
+    printf("[Ja esta balanceado]\n");
+  }
 }
 
 void clearTree(treeNode * root){
@@ -252,7 +249,7 @@ void clearTree(treeNode * root){
 }
 
 void printTreeHeight(treeNode root){
-	int h = height(root);
+	int h = getHeight(root);
 	printf("A=%d\n", h);
 }
 
@@ -270,34 +267,34 @@ void printPosOrder(treeNode root){
 	printf("]\n");
 }
 
-// void printTopDownAux(treeNode root, int h){
-//   if(h == 0){
-//     if(root){
-//       printf("%d(%d) ", root->ra, root->grade);
-//     }else{
-//       printf("- ");
-//     }
-//   }else{
-//     if(root){
-//       printTopDownAux(root->nextLeft,  h-1);
-//       printTopDownAux(root->nextRight, h-1);
-//     }else{
-//       printTopDownAux(NULL, h-1);
-//       printTopDownAux(NULL, h-1);
-//     }
-//   }
-// }
-//
-// void printTopDown(treeNode root){
-//   int h = height(root);
-//   for(int i = 0; i <= h; i++){
-//     for(int j = 0; j < h-i; j++){
-//       printf(" ");
-//     }
-//     printTopDownAux(root, i);
-//     printf("\n");
-//   }
-// }
+void printTopDownAux(treeNode root, int h){
+  if(h == 0){
+    if(root){
+      printf("%d(%d) ", root->ra, root->grade);
+    }else{
+      printf("- ");
+    }
+  }else{
+    if(root){
+      printTopDownAux(root->nextLeft,  h-1);
+      printTopDownAux(root->nextRight, h-1);
+    }else{
+      printTopDownAux(NULL, h-1);
+      printTopDownAux(NULL, h-1);
+    }
+  }
+}
+
+void printTopDown(treeNode root){
+  int h = getHeight(root);
+  for(int i = 0; i <= h; i++){
+    for(int j = 0; j < h-i; j++){
+      printf(" ");
+    }
+    printTopDownAux(root, i);
+    printf("\n");
+  }
+}
 
 void printGrade(treeNode root, int ra){
 	int i = 0;
@@ -349,9 +346,9 @@ int main(void){
 		    clearTree(&root);
         exit(0);
         break;
-      // case 'T':
-      // 	printTopDown(root);
-      // 	break;
+      case 'T':
+      	printTopDown(root);
+      	break;
     }
     scanf("\n%c", &c);
   }
