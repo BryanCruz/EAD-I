@@ -119,6 +119,44 @@ int selectionSort(int * v, int n){
   return numComparacoes;
 }
 
+//Recebe uma lista e ordena utilizando o método de seleção
+int selectionSortLista(linkedList * list){
+  int numComparacoes = 0;
+  
+  if(list->inicio == NULL) return;
+
+  for(linkedNode * tmp = list->inicio; tmp->prox != NULL; tmp = tmp->proximo){
+    //procura qual o menor elemento da parte não ordenada da lista
+    linkedNode * menor = tmp;
+    linkedNode * rodando;
+
+    for(rodando = tmp->proximo; rodando != NULL; rodando = rodando->proximo){
+
+      if(rodando->ra < menor->ra) menor = rodando;
+      numComparacoes++;
+
+    }
+    
+    //insere o menor elemento na primeira posição não ordenada do vetor
+
+    //implementar função que faz a troca dos valores dos nós
+    //trocar(tmp, menor);
+    int raAux      = tmp->ra;
+    char * nomeAux = tmp->nome;
+    int notaAux    = tmp->nota;
+
+    tmp->ra        = menor->ra; 
+    tmp->nome      = menor->nome; 
+    tmp->nota      = menor->nota; 
+  
+    menor->ra      = raAux; 
+    menor->nome    = nomeAux; 
+    menor->nota    = notaAux; 
+  }
+  
+  return numComparacoes;
+}
+
 //Recebe um vetor e ordena utilizando o método de inserção
 int insertionSort(int * v, int n){
   int numComparacoes = 0;
