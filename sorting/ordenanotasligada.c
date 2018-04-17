@@ -1,3 +1,6 @@
+/* Dupla: 11052316 Bryan Bialokur da Cruz
+		  11----16 Bruno Gottardo Ladeia */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
