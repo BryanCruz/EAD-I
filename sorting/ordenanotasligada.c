@@ -1,9 +1,10 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 //estruturas auxiliares para o código
-typedef struct linkedNode linkedNode;
 
+typedef struct linkedNode linkedNode;
 struct linkedNode{
     int   ra;
     char *nome;
@@ -14,24 +15,23 @@ struct linkedNode{
 };
 
 typedef struct linkedList linkedList;
-
 struct linkedList{
     linkedNode *inicio;
 };
 
 //Assinatura dos métodos
-int insertionSort(int *, int);
-int selectionSort(int *, int);
-void freeVector(int *);
+void ordenarLista(linkedList *, int, int);
+int selectionSort(linkedList *, int);
+int insertionSort(linkedList *, int);
+int compararNodes(linkedNode *, linkedNode *, int);
+void trocar(linkedNode * a, linkedNode * b);
+
 void excluirLista(linkedList * list);
 void excluirNode(linkedNode * node);
+
 void insert(linkedList *,int, char*, int);
 void mostra(linkedList *);
-void ordenarLista(linkedList *, int, int);
 int busca(linkedList *, int);
-
-// void testaSorting();
-
 
 int main() {
   
@@ -42,19 +42,21 @@ int main() {
   linkedList *lista = (linkedList*) malloc(sizeof(linkedList));
   lista->inicio = NULL;
     
+
+  //Executa as opções inseridas pelo usuário
   do{
     scanf("%c", &op);
     if(op >= 'a' && op <= 'z') op += 'A' - 'a';
     
     int ra, nota;
-    char nome[50];
+    char * nome;
     int algoritmo, campo;
     
     switch(op){
       case 'I':
         //Recebe os valores
+      	nome = (char *) malloc(50*sizeof(char));
         scanf("%d %s %d", &ra, nome, &nota);
-        printf("%d %s %d\n", ra, nome, nota);
         
         //Insere os valores recebidos na lista
         insert(lista, ra, nome, nota);
@@ -90,130 +92,125 @@ int main() {
   return 0;
 }
 
+//campo == 1 -> ordenar por ra
+//campo == 2 -> ordenar por nome
+int compararNodes(linkedNode * a, linkedNode * b, int campo){
+	int result;
+	if(campo == 1){
 
-void exibirVetor(int * v, int n){
-  for(int i = 0; i < n; i++){
-    printf("%d ", v[i]);
-  }
-  printf("\n");
+		if(a->ra < b->ra){
+			result = -1;
+		}else if(a->ra == b->ra){
+			result = 0;
+		}else{
+			result = 1;
+		}
+
+	}else{
+
+		result = strcmp(a->nome, b->nome);
+
+	}
+
+	return result;
 }
 
-//Recebe um vetor e seu tamanho ordena utilizando o método de seleção
-int selectionSort(int * v, int n){
-  int numComparacoes = 0;
+void trocar(linkedNode * a, linkedNode * b){
+	int raAux      = a->ra;
+    char * nomeAux = a->nome;
+    int notaAux    = a->nota;
+
+    a->ra          = b->ra; 
+    a->nome        = b->nome; 
+    a->nota        = b->nota; 
   
-  for(int i = 0; i < n-1; i++){
-    //procura qual o menor elemento do vetor não ordenado
-    int menor = v[i], iMenor = i;
-    
-    for(int j = i+1; j < n; j++){
-      if(v[j] < menor) menor = v[j], iMenor = j;
-      numComparacoes++;
-    }
-    
-    //insere o menor elemento na primeira posição não ordenada do vetor
-    v[iMenor] = v[i];
-    v[i]      = menor;
-  }
-  
-  return numComparacoes;
+    b->ra          = raAux; 
+    b->nome        = nomeAux; 
+    b->nota        = notaAux; 
 }
 
 //Recebe uma lista e ordena utilizando o método de seleção
-int selectionSortLista(linkedList * list){
+int selectionSort(linkedList * list, int campo){
   int numComparacoes = 0;
   
-  if(list->inicio == NULL) return;
+  if(list->inicio == NULL) return 0;
 
-  for(linkedNode * tmp = list->inicio; tmp->prox != NULL; tmp = tmp->proximo){
+  for(linkedNode * tmp = list->inicio; tmp->proximo != NULL; tmp = tmp->proximo){
     //procura qual o menor elemento da parte não ordenada da lista
     linkedNode * menor = tmp;
     linkedNode * rodando;
 
     for(rodando = tmp->proximo; rodando != NULL; rodando = rodando->proximo){
 
-      if(rodando->ra < menor->ra) menor = rodando;
+      //if(rodando->ra < menor->ra) menor = rodando;
+      if(compararNodes(rodando, menor, campo) < 0) menor = rodando;
       numComparacoes++;
-
     }
     
     //insere o menor elemento na primeira posição não ordenada do vetor
-
-    //implementar função que faz a troca dos valores dos nós
-    //trocar(tmp, menor);
-    int raAux      = tmp->ra;
-    char * nomeAux = tmp->nome;
-    int notaAux    = tmp->nota;
-
-    tmp->ra        = menor->ra; 
-    tmp->nome      = menor->nome; 
-    tmp->nota      = menor->nota; 
-  
-    menor->ra      = raAux; 
-    menor->nome    = nomeAux; 
-    menor->nota    = notaAux; 
+    trocar(tmp, menor);
   }
   
   return numComparacoes;
 }
 
 //Recebe um vetor e ordena utilizando o método de inserção
-int insertionSort(int * v, int n){
+int insertionSort(linkedList * lista, int campo){
+  if(lista->inicio == NULL) return 0;
+
   int numComparacoes = 0;
-  
-  //Pega o elemento da posicao j 
-  //e insere corretamente no vetor já ordenado a esquerda
-  for(int i = 1; i < n; i++){
+
+  //Pega o próximo elemento da parte não ordenada e 
+  //insere corretamente na parte já ordenada (à esquerda)
+  linkedNode * aSerInserido;
+  for(aSerInserido = (lista->inicio)->proximo; aSerInserido != NULL; aSerInserido = aSerInserido->proximo){
+    //vai passando o elemento a ser inserido para a esquerda (na parte ordenada)
+    //enquanto ele for menor que o elemento a sua esquerda, mantendo assim a ordenação
+    
+    linkedNode * tmp;
+    for(tmp = aSerInserido->anterior; tmp != NULL && ++numComparacoes  
+        && compararNodes(tmp, aSerInserido, campo) > 0; tmp = tmp->anterior){
       
-    //acha a posição na parte ordenada onde o primeiro 
-    //elemento da parte não ordenada deve ser inserido
-    int j;
-    for(j = i-1; j >=0 && ++numComparacoes && v[j] > v[j+1]; j--){
       //faz a troca dos elementos
-      int aux = v[j];
-      v[j]    = v[j+1];
-      v[j+1]  = aux;
+      trocar(tmp, aSerInserido);
     }
   }
   
   return numComparacoes;
 }
 
-void freeVector(int *v){
-  free(v);
-}
-
-void insert(linkedList *l, int ra, char *nome, int nota){
+void insert(linkedList *lista, int ra, char *nome, int nota){
   
   //cria um linkedNode com os dados informados
   linkedNode *novo = (linkedNode*) malloc(sizeof(linkedNode));
+
   novo->ra = ra;
   novo->nome = nome;
   novo->nota = nota;
   novo->proximo = NULL;
   novo->anterior = NULL;
   
-  
   //insere o novo linkedNode na lista
-  if(l->inicio == NULL){
-    l->inicio = novo;
+  if(lista->inicio == NULL){
+    lista->inicio = novo;
     
   }else{
-    linkedNode *tmp = l->inicio;
+    linkedNode *tmp = lista->inicio;
     
     while(tmp->proximo != NULL){
       tmp = tmp->proximo;
     }
+
+    tmp->proximo   = novo;
     novo->anterior = tmp;
-    tmp->proximo = novo;
   }
 }
 
 //busca dentro da lista pelo elemento e retorna a posicao dele
 //caso o elemento não exista retorna -1
-int busca(linkedList *l, int ra){
+int busca(linkedList * lista, int ra){
   int pos = 0;
-  linkedNode *tmp = l->inicio;
+  linkedNode *tmp = lista->inicio;
   
   while(tmp != NULL){
     
@@ -228,10 +225,9 @@ int busca(linkedList *l, int ra){
   return -1;
 }
 
-//imprime os valores da lista (alunos)
-//one line at a time
-void mostra(linkedList *l){
-  linkedNode *tmp = l->inicio;
+//imprime os valores da lista (alunos) linha por linha
+void mostra(linkedList *lista){
+  linkedNode *tmp = lista->inicio;
   
   while(tmp != NULL){
     printf("[%d %s %d]\n", tmp->ra, tmp->nome, tmp->nota);
@@ -240,22 +236,27 @@ void mostra(linkedList *l){
   }
 }
 
-
 //ordena a lista de acordo com as opções: 
 //  algoritmo: 1 - Selection
 //             2 - Insertion
 //
 //  campo:     1 - RA
 //             2 - Nome
-void ordenarLista(linkedList *l, int algoritmo, int campo){
+void ordenarLista(linkedList *lista, int algoritmo, int campo){
+  int numComparacoes;
   if(algoritmo == 1){
     //chama o ordenacao por selecao
-  } else {
+    numComparacoes = selectionSort(lista, campo);
+  }else{
     //chama ordenacao por insercao
+    numComparacoes = insertionSort(lista, campo);
   }
+
+  printf("Comparacoes=%d\n", numComparacoes);
 }
 
 void excluirNode(linkedNode * node){
+  free(node->nome);
   free(node);
 }
 
@@ -271,43 +272,3 @@ void excluirLista(linkedList * lista){
 
   free(lista);
 }
-
-// void testaSorting(){
-//   int n = 10;
-//   int *v = (int*) malloc(n*sizeof(int));
-//   v[0] = 1;
-//   v[1] = 0;
-//   v[2] = 5;
-//   v[3] = 875;
-//   v[4] = 121;
-//   v[5] = -2;
-//   v[6] = 4;
-//   v[7] = 73;
-//   v[8] = 12;
-//   v[9] = -64;
-  
-//   printf("vetor inicial: ");
-//   exibirVetor(v, n);
-  
-//   selectionSort(v, n);
-  
-//   printf("selection sort: ");
-//   exibirVetor(v, n);
-//   v[0] = 1;
-//   v[1] = 0;
-//   v[2] = 5;
-//   v[3] = 875;
-//   v[4] = 121;
-//   v[5] = -2;
-//   v[6] = 4;
-//   v[7] = 73;
-//   v[8] = 12;
-//   v[9] = -64;
-  
-//   printf("vetor inicial: ");
-//   exibirVetor(v, n);
-//   insertionSort(v, n);
-//   printf("insertion sort: ");
-//   exibirVetor(v, n);
-  
-// } 
