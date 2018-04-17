@@ -172,10 +172,10 @@ int insertionSort(linkedList * lista, int campo){
     
     linkedNode * tmp;
     for(tmp = aSerInserido->anterior; tmp != NULL && ++numComparacoes  
-        && compararNodes(tmp, aSerInserido, campo) > 0; tmp = tmp->anterior){
+        && compararNodes(tmp, tmp->proximo, campo) > 0; tmp = tmp->anterior){
       
       //faz a troca dos elementos
-      trocar(tmp, aSerInserido);
+      trocar(tmp, tmp->proximo);
     }
   }
   
