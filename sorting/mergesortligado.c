@@ -13,12 +13,10 @@ struct linkedNode{
     linkedNode prev;
 };
 
-
-// long int merge(int [], int, int, int);
 void printList(linkedNode);
 linkedNode createNode(int, int);
 linkedNode insert(linkedNode *, int, int);
-void freeList(linkedNode, linkedNode);
+void freeList(linkedNode);
 
 void mergeSort(linkedNode *, linkedNode *, int);
 void merge(linkedNode *, linkedNode *, linkedNode *, int);
@@ -46,7 +44,7 @@ int main(){
         break;
 
       case 6:
-        //sorts the list in crescent order
+        //sorts the list in increasing order
         mergeSort(&first, &last, 1);
         printList(first);
         break;
@@ -63,40 +61,31 @@ int main(){
     }
   } while(op != 0);
 
-    freeList(first, last);
-
+  freeList(first);
   return 0;
 }
 
 void merge(linkedNode * first, linkedNode * middle, linkedNode * last, int op){
-  printf("merge\n");
   //create an aux list
-  linkedNode auxList = NULL;
+  linkedNode auxList  = NULL;
   linkedNode tmpLeft  = *first;
   linkedNode tmpRight = *middle;
 
   int (*compare)(linkedNode, linkedNode) = (op == 1? &isSmaller : &isBigger);
 
+  int changeFirst, changeLast;
   if(compare(tmpLeft, tmpRight)){
-    printf("if");
     auxList = tmpLeft;
     tmpLeft = tmpLeft->next;
-    printf(" fim if\n");
+
+    changeFirst = 0;
   }else{
-    printf("else");
     auxList = tmpRight;
+    auxList->prev = (*first)->prev;
+    tmpRight = tmpRight->next;
 
-    tmpRight->prev = (*first)->prev;
-    if((*first)->prev){
-      ((*first)->prev)->next = tmpRight;
-    }else{
-      *first         = *middle;
-    }
-
-    tmpRight = auxList->next;
-    printf(" fim else\n");
+    changeFirst = 1;
   }
-
 
   //compare element by element and add to the aux list
   while(tmpLeft != *middle && tmpRight != (*last)->next){
@@ -114,29 +103,34 @@ void merge(linkedNode * first, linkedNode * middle, linkedNode * last, int op){
     auxList       = theChosenOne;
   }
 
-  printf("sai do while mano\n");
   //add the remaining list
   if(tmpLeft != *middle){
-    printf("aí entrei no if ");
     tmpLeft->prev = auxList;
     auxList->next = tmpLeft;
 
     while(auxList->next != *middle){
       auxList = auxList->next;
     }
-
     auxList->next = (*last)->next;
-    if((*last)->next){
-      ((*last)->next)->prev = auxList;
-    }else{
-      *last = auxList;
-    }
-    printf(" e sai do if\n");
+
+    changeLast = 1;
   }else{
-    printf("ai entrei no else ");
     tmpRight->prev = auxList;
     auxList->next = tmpRight;
-    printf(" e sai do else\n");
+
+    changeLast = 0;
+  }
+
+
+  if(changeFirst){
+    printf("change first m8\n");
+    (*first) = (*middle);
+  }
+
+  if(changeLast){
+    printf("change last m8\n");
+    (*last)->next = *first; 
+    (*last) = auxList;
   }
 }
 
@@ -144,18 +138,16 @@ void mergeSort(linkedNode * first, linkedNode * last, int op){
   printList(*first);
   if(*first == *last) return;
 
-  printf("find middle\n");
+  printf("start findMiddle\n");
   linkedNode * middle = findMiddle(first, last);
-  printf("middle next\n");
-  linkedNode * middleNext = &((*middle)->next);
+  printf("end findMiddle\n");
 
-  printf("Opa\n");
   mergeSort(first, middle, op);
-  printf("merge1 ");
-  mergeSort(middleNext, last, op);
-  printf("merge2 ");
-  merge(first, middleNext, last, op);
-  printf("merge tudo\n");
+  mergeSort(&(*middle)->next, last, op);
+
+  printf("start merge\n");
+  merge(first, &(*middle)->next, last, op);
+  printf("end merge\n");
 }
 
 int isBigger(linkedNode a, linkedNode b){
@@ -164,17 +156,6 @@ int isBigger(linkedNode a, linkedNode b){
 
 int isSmaller(linkedNode a, linkedNode b){
   return a->ra < b->ra;
-}
-
-void swap(linkedNode a, linkedNode b){
-  int tmpRa    = a->ra;
-  int tmpGrade = a->grade;
-
-  a->ra        = b->ra;
-  a->grade     = b->grade;
-
-  b->ra        = tmpRa;
-  b->grade     = tmpGrade;
 }
 
 linkedNode createNode(int ra, int grade){
@@ -234,14 +215,10 @@ void printList(linkedNode list){
   printf("\n");
 }
 
-void freeList(linkedNode first, linkedNode last){
-  if(first == NULL || last == NULL){
-    return;
-  }
-
-  while(first != last->next){
-    linkedNode tmp = first->next;
-    free(first);
-    first = tmp;
+void freeList(linkedNode list){
+  while(list != NULL){
+    linkedNode tmp = list->next;
+    free(list);
+    list = tmp;
   }
 }
