@@ -10,23 +10,23 @@ struct linkedNode{
     int ra;
     int grade;
     linkedNode next;
-    linkedNode prev;
 };
 
-void printList(linkedNode);
+void printList(linkedNode, linkedNode);
 linkedNode createNode(int, int);
 linkedNode insert(linkedNode *, int, int);
 void freeList(linkedNode);
 
-void mergeSort(linkedNode *, linkedNode *, int);
-void merge(linkedNode *, linkedNode *, linkedNode *, int);
+linkedNode mergeSort(linkedNode *, linkedNode *, int, int);
+linkedNode merge(linkedNode *, linkedNode *, linkedNode *, int);
 int isBigger(linkedNode, linkedNode);
 int isSmaller(linkedNode, linkedNode);
-linkedNode * findMiddle(linkedNode*, linkedNode*);
+linkedNode * findMiddle(linkedNode*, int);
 
 int main(){
   linkedNode first = NULL;
   linkedNode last  = NULL;
+  int listSize = 0;
 
   int op, ra, grade;
   do{
@@ -36,23 +36,24 @@ int main(){
         //inserts a new item at the end of the list
         scanf("%d %d", &ra, &grade);
         last = insert(&first, ra, grade);
+        listSize++;
         break;
 
       case 2:
         //prints out the list
-        printList(first);
+        printList(first, NULL);
         break;
 
       case 6:
         //sorts the list in increasing order
-        mergeSort(&first, &last, 1);
-        printList(first);
+        mergeSort(&first, &last, 1, listSize);
+        printList(first, NULL);
         break;
 
       case 9:
         //sorts the list in descreasing order
-        mergeSort(&first, &last, 2);
-        printList(first);
+        mergeSort(&first, &last, 2, listSize);
+        printList(first, NULL);
         break;
 
       default:
@@ -65,89 +66,68 @@ int main(){
   return 0;
 }
 
-void merge(linkedNode * first, linkedNode * middle, linkedNode * last, int op){
+linkedNode merge(linkedNode * firstList, linkedNode * secList, linkedNode * last, int op){
   //create an aux list
-  linkedNode auxList  = NULL;
-  linkedNode tmpLeft  = *first;
-  linkedNode tmpRight = *middle;
+  linkedNode auxList = NULL;
+  linkedNode auxLast = NULL;
+  linkedNode lastNext = (*last)->next;
 
-  int (*compare)(linkedNode, linkedNode) = (op == 1? &isSmaller : &isBigger);
+  linkedNode tmpLeft = *firstList;
+  linkedNode tmpRight = *secList;
+	int (*compare)(linkedNode, linkedNode) = (op == 1? &isSmaller : &isBigger);
 
-  int changeFirst, changeLast;
-  if(compare(tmpLeft, tmpRight)){
-    auxList = tmpLeft;
-    tmpLeft = tmpLeft->next;
+  while(tmpLeft != *secList || tmpRight != lastNext){
 
-    changeFirst = 0;
-  }else{
-    auxList = tmpRight;
-    auxList->prev = (*first)->prev;
-    tmpRight = tmpRight->next;
 
-    changeFirst = 1;
-  }
-
-  //compare element by element and add to the aux list
-  while(tmpLeft != *middle && tmpRight != (*last)->next){
     linkedNode theChosenOne;
-    if(compare(tmpLeft, tmpRight)){
+
+    if(tmpRight == lastNext || compare(tmpLeft, tmpRight)){
+
       theChosenOne = tmpLeft;
       tmpLeft = tmpLeft->next;
+
     }else{
+
       theChosenOne = tmpRight;
       tmpRight = tmpRight->next;
+
     }
 
-    theChosenOne->prev = auxList;
-    auxList->next = theChosenOne;
-    auxList       = theChosenOne;
-  }
-
-  //add the remaining list
-  if(tmpLeft != *middle){
-    tmpLeft->prev = auxList;
-    auxList->next = tmpLeft;
-
-    while(auxList->next != *middle){
-      auxList = auxList->next;
-    }
-    auxList->next = (*last)->next;
-
-    changeLast = 1;
-  }else{
-    tmpRight->prev = auxList;
-    auxList->next = tmpRight;
-
-    changeLast = 0;
+    if(!auxList) auxList       = theChosenOne;
+    else         auxLast->next = theChosenOne;
+    auxLast = theChosenOne;
   }
 
 
-  if(changeFirst){
-    printf("change first m8\n");
-    (*first) = (*middle);
-  }
+  *firstList = auxList;
+  auxLast->next = lastNext;
 
-  if(changeLast){
-    printf("change last m8\n");
-    (*last)->next = *first; 
-    (*last) = auxList;
-  }
+  return auxLast;
 }
 
-void mergeSort(linkedNode * first, linkedNode * last, int op){
-  printList(*first);
-  if(*first == *last) return;
+linkedNode mergeSort(linkedNode * first, linkedNode * last, int op, int listSize){
+  if(*first == *last) return *first;
 
-  printf("start findMiddle\n");
-  linkedNode * middle = findMiddle(first, last);
-  printf("end findMiddle\n");
+  printf("%d ", listSize);
+  printList(*first, (*last)->next);
 
-  mergeSort(first, middle, op);
-  mergeSort(&(*middle)->next, last, op);
+  linkedNode * middle = findMiddle(first, listSize);
+  linkedNode * middleNext = &((*middle)->next);
 
-  printf("start merge\n");
-  merge(first, &(*middle)->next, last, op);
-  printf("end merge\n");
+  linkedNode teste1 = mergeSort(first, middle, op, listSize - listSize/2);
+  middle = &(teste1);
+  printList(*first, (*last)->next);
+
+  linkedNode teste2 = mergeSort(&((*middle)->next), last, op, listSize/2);
+  last   = &(teste2);
+  printList(*first, (*last)->next);
+
+  linkedNode teste3 = merge(first, &(*middle)->next, last, op);
+  last = &(teste3);
+
+  printList(*first, (*last)->next);
+
+  return *last;
 }
 
 int isBigger(linkedNode a, linkedNode b){
@@ -164,7 +144,6 @@ linkedNode createNode(int ra, int grade){
   newNode->ra    = ra;
   newNode->grade = grade;
   newNode->next  = NULL;
-  newNode->prev  = NULL;
 
   return newNode;
 }
@@ -182,32 +161,23 @@ linkedNode insert(linkedNode *first, int ra, int grade){
       tmp = tmp->next;
     }
     tmp->next = newNode;
-    newNode->prev = tmp;
   }
 
   return newNode;
 }
 
-linkedNode * findMiddle(linkedNode * first, linkedNode * last){
-  linkedNode * leftNode = first;
-  linkedNode * rightNode = last;
-
-  int step = 1;
-
-  while(*leftNode != *rightNode){
-    if(!step) leftNode  = &((*leftNode)->next);
-    else      rightNode = &((*rightNode)->prev);
-
-    step = !step;
+linkedNode * findMiddle(linkedNode * list, int listSize){
+  for(int i = 1; i < listSize - listSize/2; i++){
+    list = &((*list)->next);
   }
 
-  return leftNode;
+  return list;
 }
 
-void printList(linkedNode list){
+void printList(linkedNode list, linkedNode last){
   linkedNode tmp = list;
   printf("[LISTA]\n");
-  while(tmp != NULL){
+  while(tmp != last){
     printf("[%d %d] ", tmp->ra, tmp->grade);
 
     tmp = tmp->next;
