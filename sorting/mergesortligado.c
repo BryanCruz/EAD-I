@@ -11,14 +11,14 @@ struct linkedNode{
     int grade;
     linkedNode next;
 };
-
+void tabular(int);
 void printList(linkedNode, linkedNode);
 linkedNode createNode(int, int);
 linkedNode insert(linkedNode *, int, int);
 void freeList(linkedNode);
 
 void mergeSort(linkedNode *, linkedNode, int, int);
-linkedNode merge(linkedNode *, linkedNode *, linkedNode, int);
+void merge(linkedNode *, linkedNode *, linkedNode, int);
 int isBigger(linkedNode, linkedNode);
 int isSmaller(linkedNode, linkedNode);
 linkedNode * findMiddle(linkedNode*, int);
@@ -28,10 +28,11 @@ int main(){
   int listSize = 0;
 
   int op, ra, grade;
+
   do{
     scanf("%d", &op);
     switch(op){
-      printf("%d", op);
+      //printf("%d", op);
       case 1:
         //inserts a new item at the end of the list
         scanf("%d %d", &ra, &grade);
@@ -66,50 +67,38 @@ int main(){
   return 0;
 }
 
-int opa = 0;
+int top = 0;
+
+void tabular(int n){
+  for(int i = 0; i < n; i++){
+    printf("--");
+  }
+}
 
 // mergeSort from the first node to the last node before last reference
 void mergeSort(linkedNode * first, linkedNode last, int op, int listSize){
-  opa++;
-
-  for(int i = 0; i < opa; i++){
-    printf("--");
-  }
-  printf("merge de: %d até: %d\n", (*first)->ra, last? last->ra : -1);
-    for(int i = 0; i < opa; i++){
-      printf("--");
-    }
-    printf("tam lista %d\n", listSize);
+  top++;
   printList(*first, last);
-
   if(listSize > 1){
+    tabular(top);printf("<\n");
+
     linkedNode * middle = findMiddle(first, listSize);
-                              for(int i = 0; i < opa; i++){
-                                printf("--");
-                              }
-    printf("middle antes = %d\n", (*middle)->ra);
 
-                            for(int i = 0; i < opa; i++){
-                              printf("--");
-                            } printf("<\n");
     mergeSort(first, *middle, op, listSize - listSize/2);
-
-                          for(int i = 0; i < opa; i++){
-                            printf("--");
-                          }
-                          printf(">\n");
+    tabular(top);printf(">\n");
+    middle = findMiddle(first, listSize);
 
     mergeSort(middle, last, op, listSize/2);
 
     merge(first, middle, last, op);
   }
   printList(*first, last);
-  opa--;
+  top--;
 }
 
-linkedNode merge(linkedNode * firstList, linkedNode * secList, linkedNode last, int op){
+void merge(linkedNode * firstList, linkedNode * secList, linkedNode last, int op){
   //create an aux list
-  printf("merge\n");
+tabular(top);  //printf("merge\n");
   linkedNode auxList = NULL;
   linkedNode auxLast = NULL;
 
@@ -118,7 +107,8 @@ linkedNode merge(linkedNode * firstList, linkedNode * secList, linkedNode last, 
 	int (*compare)(linkedNode, linkedNode) = (op == 1? &isSmaller : &isBigger);
 
   while(tmpLeft != *secList || tmpRight != last){
-    printf("tmpLeft=%d tmpRight=%d\n", tmpLeft->ra, tmpRight? tmpRight->ra : -1);
+    printf( "(%d %d - %d %d ", tmpLeft->ra, (*secList)->ra, tmpLeft != *secList, tmpRight != last);
+    //printf("tmpLeft=%d tmpRight=%d\n", tmpLeft->ra, tmpRight? tmpRight->ra : -1);
     linkedNode theChosenOne;
     if(tmpRight == last || (tmpLeft != *secList && compare(tmpLeft, tmpRight))){
       theChosenOne = tmpLeft;
@@ -129,16 +119,19 @@ linkedNode merge(linkedNode * firstList, linkedNode * secList, linkedNode last, 
       tmpRight = tmpRight->next;
     }
 
-    if(!auxList) auxList       = theChosenOne;
-    else         auxLast->next = theChosenOne;
+    printf("adding [%d %d] ) ", theChosenOne->ra, theChosenOne->grade);
+
+    if(!auxList){
+      auxList    = theChosenOne;
+      *firstList = auxList;
+    }else{
+      auxLast->next = theChosenOne;
+    }
     auxLast = theChosenOne;
   }
 
-
-  *firstList = auxList;
   auxLast->next = last;
-
-  return auxList;
+  printf("\n");
 }
 
 int isBigger(linkedNode a, linkedNode b){
@@ -189,18 +182,11 @@ linkedNode * findMiddle(linkedNode * list, int listSize){
 
 void printList(linkedNode list, linkedNode last){
   linkedNode tmp = list;
-  for(int i = 0; i < opa; i++){
-    printf("--");
-  }
-   printf("[LISTA]\n");
-
-  for(int i = 0; i < opa; i++){
-    printf("--");
-  }
+  tabular(top);
+  printf("[LISTA]\n");
+  tabular(top);
   while(tmp != last){
-
     printf("[%d %d] ", tmp->ra, tmp->grade);
-
     tmp = tmp->next;
   }
   printf("\n");
