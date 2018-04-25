@@ -93,15 +93,12 @@ void mergeSort(linkedNode * first, linkedNode last, int op, int listSize){
                               printf("--");
                             } printf("<\n");
     mergeSort(first, *middle, op, listSize - listSize/2);
-                          for(int i = 0; i < opa; i++){
-                            printf("--");
-                          }
-                          printf("middle depois = %d\n", (*middle)->ra);
-
+  
                           for(int i = 0; i < opa; i++){
                             printf("--");
                           }
                           printf(">\n");
+
     mergeSort(middle, last, op, listSize/2);
 
     merge(first, middle, last, op);
@@ -120,7 +117,7 @@ linkedNode merge(linkedNode * firstList, linkedNode * secList, linkedNode last, 
 	int (*compare)(linkedNode, linkedNode) = (op == 1? &isSmaller : &isBigger);
 
   while(tmpLeft != *secList || tmpRight != last){
-
+    printf("tmpLeft=%d\n", tmpLeft->ra);
     linkedNode theChosenOne;
     if(tmpRight == last || compare(tmpLeft, tmpRight)){
       theChosenOne = tmpLeft;
@@ -129,7 +126,6 @@ linkedNode merge(linkedNode * firstList, linkedNode * secList, linkedNode last, 
     }else{
       theChosenOne = tmpRight;
       tmpRight = tmpRight->next;
-
     }
 
     if(!auxList) auxList       = theChosenOne;
@@ -138,7 +134,7 @@ linkedNode merge(linkedNode * firstList, linkedNode * secList, linkedNode last, 
   }
 
 
-  *firstList = auxList;
+  // *firstList = auxList;
   auxLast->next = last;
 
   // printf("auxLast %d, last = %d, auxLast->last %d\n", auxLast->ra, last? last->ra : -1, (auxLast->next)? auxLast->next->ra : -1);
@@ -147,11 +143,13 @@ linkedNode merge(linkedNode * firstList, linkedNode * secList, linkedNode last, 
 }
 
 int isBigger(linkedNode a, linkedNode b){
-  return a->ra > b->ra;
+  int result = a->ra > b->ra;
+  return result;
 }
 
 int isSmaller(linkedNode a, linkedNode b){
-  return a->ra < b->ra;
+  int result = a->ra < b->ra;
+  return result;
 }
 
 linkedNode createNode(int ra, int grade){
