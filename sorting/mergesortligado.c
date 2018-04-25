@@ -93,7 +93,7 @@ void mergeSort(linkedNode * first, linkedNode last, int op, int listSize){
                               printf("--");
                             } printf("<\n");
     mergeSort(first, *middle, op, listSize - listSize/2);
-  
+
                           for(int i = 0; i < opa; i++){
                             printf("--");
                           }
@@ -109,6 +109,7 @@ void mergeSort(linkedNode * first, linkedNode last, int op, int listSize){
 
 linkedNode merge(linkedNode * firstList, linkedNode * secList, linkedNode last, int op){
   //create an aux list
+  printf("merge\n");
   linkedNode auxList = NULL;
   linkedNode auxLast = NULL;
 
@@ -117,9 +118,9 @@ linkedNode merge(linkedNode * firstList, linkedNode * secList, linkedNode last, 
 	int (*compare)(linkedNode, linkedNode) = (op == 1? &isSmaller : &isBigger);
 
   while(tmpLeft != *secList || tmpRight != last){
-    printf("tmpLeft=%d\n", tmpLeft->ra);
+    printf("tmpLeft=%d tmpRight=%d\n", tmpLeft->ra, tmpRight? tmpRight->ra : -1);
     linkedNode theChosenOne;
-    if(tmpRight == last || compare(tmpLeft, tmpRight)){
+    if(tmpRight == last || (tmpLeft != *secList && compare(tmpLeft, tmpRight))){
       theChosenOne = tmpLeft;
       tmpLeft = tmpLeft->next;
 
@@ -134,10 +135,8 @@ linkedNode merge(linkedNode * firstList, linkedNode * secList, linkedNode last, 
   }
 
 
-  // *firstList = auxList;
+  *firstList = auxList;
   auxLast->next = last;
-
-  // printf("auxLast %d, last = %d, auxLast->last %d\n", auxLast->ra, last? last->ra : -1, (auxLast->next)? auxLast->next->ra : -1);
 
   return auxList;
 }
