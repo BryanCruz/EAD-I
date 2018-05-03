@@ -44,44 +44,45 @@ void deleteList(linkedNode list){
 }
 
 linkedNode quickSort(linkedNode list, linkedNode last){
-	if(list->next == last) return list;
+	linkedNode pivo 	= list;
 
-	printList(list, last);
-
-	linkedNode pivo 			  = list;
-	linkedNode menores 			= NULL;
+	linkedNode menores 	= NULL;
 	linkedNode menoresLast  = NULL;
 
+	linkedNode maiores      = NULL;	
+	linkedNode maioresLast  = NULL;
+
 	linkedNode tmp 	   = pivo->next;
-	linkedNode prev    = pivo;
 
-	while(tmp && tmp != last){
-
+	while(tmp != last){
 		if(tmp->value < pivo->value){
-			if(!menores){
-				menores = tmp;
-			}else{
-				menoresLast->next = tmp;
-			}
+			if(!menores)	  menores = tmp;
+			else	menoresLast->next = tmp;
+			
 			menoresLast = tmp;
-
-			prev->next = tmp->next;
 		}else{
-			prev = tmp;
+			if(!maiores)      maiores = tmp;
+			else    maioresLast->next = tmp;
+
+			maioresLast = tmp;
 		}
-
-		tmp = tmp->next;
+		tmp = tmp->next;		
 	}
-
 
 	if(menores){
 		menoresLast->next = pivo;
 	}
-
-	printList(list, last);
-	if(menores    != NULL) 	quickSort(menores, menoresLast->next);
-	if(pivo->next != last)	pivo->next = quickSort(pivo->next, last);
-
+	if(maiores){	
+		pivo->next 	  = maiores;
+		maioresLast->next = last;
+	}else{
+		pivo->next = last;
+	}
+	
+	
+	if(menores    != NULL) 	menores    = quickSort(menores, pivo);
+	if(maiores    != NULL)	pivo->next = quickSort(maiores, last);
+	
 	return menores? menores : pivo;
 }
 
@@ -94,7 +95,7 @@ int main(void){
 	do{
 		scanf(" %c", &op);
 		if(op >= 'a' && op <= 'z') op += 'A' - 'a';
-		printf("escolheu %c\n", op);
+		printf("%c\n", op);
 
 		switch(op){
 			case 'I':
