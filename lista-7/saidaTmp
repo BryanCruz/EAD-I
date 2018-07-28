@@ -1,0 +1,95 @@
+5 
+IS BALANCED
+
+5 
+IS BALANCED
+
+ 5 
+3 - 
+IS BALANCED
+
+  5 
+ 3 - 
+2 - - - 
+IS NOT BALANCED
+
+   5 
+  3 - 
+ 2 - - - 
+1 - - - - - - - 
+IS NOT BALANCED
+
+   5 
+  3 - 
+ 2 4 - - 
+1 - - - - - - - 
+IS NOT BALANCED
+
+   5 
+  3 8 
+ 2 4 - - 
+1 - - - - - - - 
+IS NOT BALANCED
+
+   5 
+  3 8 
+ 2 4 7 - 
+1 - - - - - - - 
+IS BALANCED
+
+   3 
+  2 5 
+ 1 - 4 8 
+- - - - - - 7 - 
+IS BALANCED
+
+    3 
+   2 5 
+  1 - 4 8 
+ - - - - - - 7 - 
+- - - - - - - - - - - - 6 - - - 
+IS NOT BALANCED
+
+    3 
+   2 5 
+  1 - 4 8 
+ - - - - - - 7 10 
+- - - - - - - - - - - - 6 - - - 
+IS NOT BALANCED
+
+    3 
+   2 5 
+  1 - 4 8 
+ - - - - - - 7 10 
+- - - - - - - - - - - - 6 - 9 - 
+IS NOT BALANCED
+
+    3 
+   2 5 
+  1 - 4 8 
+ - - - - - - 7 10 
+- - - - - - - - - - - - 6 - 9 - 
+IS NOT BALANCED
+
+    3 
+   2 5 
+  1 - 4 8 
+ - - - - - - 7 10 
+- - - - - - - - - - - - 6 - 9 11 
+IS NOT BALANCED
+
+    3 
+   2 5 
+  1 - 4 8 
+ - - - - - - 7 10 
+- - - - - - - - - - - - 6 - 9 11 
+IS NOT BALANCED
+
+IS NOT BALANCED
+    3 
+   2 5 
+  1 - 4 8 
+ - - - - - - 7 10 
+- - - - - - - - - - - - 6 - 9 11 
+IS NOT BALANCED
+
